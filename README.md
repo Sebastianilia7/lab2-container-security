@@ -1,13 +1,27 @@
-# Lab 2 – Supply Chain Security & Network Policies
+# Lab 2 – Container Security & Supply Chain Security
 
-Jag har slutfört labben och verifierat alla steg:
+Labben visar hur man bygger, scannar, härdar och signerar en container, genererar SBOM och testar nätverkssäkerhet med NetworkPolicies i Kubernetes.
 
-- SBOM genererad: `sboms/vulnerable-app.spdx.json`
-- Cosign key-based signering utförd och verifierad
-- NetworkPolicies testade:
-  - Frontend → Backend fungerar
-  - Frontend → Mongo blockeras
-- Sårbar och härdad Dockerfile, Trivy-scan klar
-- Reflektion / dokumentation inkluderad
+## Vad som gjorts
 
-Repo: [https://github.com/Sebastianilia7/lab2-container-security/tree/main/app](https://github.com/Sebastianilia7/lab2-container-security/tree/main/app)
+- Byggt en **sårbar Dockerfile** (medvetet osäker)
+- Scannat med **Trivy** (visar kritiska sårbarheter)
+- Härdat Dockerfile (non-root, minimal base image, rensat cache etc.)
+- Trivy-scan på härdad image (färre eller inga kritiska sårbarheter)
+- Genererat **SBOM** (SPDX-format): `sboms/vulnerable-app.spdx.json`
+- Signerat image med **Cosign** (key-based) och verifierat signaturen
+- Testat **NetworkPolicies** i Kubernetes:
+  - Frontend → Backend: tillåtet
+  - Frontend → MongoDB: blockerat
+- Reflektion och dokumentation inkluderad
+
+## Sårbar Dockerfile (exempel)
+
+```dockerfile
+FROM node:18
+WORKDIR /app
+COPY . .
+RUN npm install
+USER root
+EXPOSE 3000
+CMD ["node", "src/index.js"]
