@@ -29,7 +29,7 @@ Screenshots
 ### Screenshots
 
 **Bad Pod**
-![Bad Pod](app/images/labb2.png)
+![Lab 2 Screenshot](~/Downloads/labb2.png)
 
 **Hardened Pod**
-![Hardened Pod](app/images/labb2-bild.png)
+![Lab 2 Bild](~/Downloads/labb2\ bild.png)
