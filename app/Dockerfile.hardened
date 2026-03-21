@@ -1,0 +1,22 @@
+FROM node:18-alpine
+
+# Skapa arbetskatalog
+WORKDIR /app
+
+# Kopiera package.json och package-lock.json först
+COPY package*.json ./
+
+# Installera endast produktionsberoenden och rensa cache
+RUN npm ci --only=production && rm -rf /var/cache/apk/* /tmp/*
+
+# Kopiera resten av appen
+COPY . .
+
+# Kör som non-root user
+USER node
+
+# Exponera port
+EXPOSE 3000
+
+# Startkommando
+CMD ["node", "src/index.js"]
