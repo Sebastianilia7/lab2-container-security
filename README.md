@@ -26,7 +26,8 @@ Gatekeeper-policys: Policy-as-code nekar automatiskt osäkra pods (“Bad Pod”
 
 ### Screenshots
 Bad pod
-<img width="1171" height="764" alt="Lab 2 Screenshot" src="https://github.com/user-attachments/assets/<din-bild-id>" />
+<img width="1410" height="706" alt="labb2bild" src="https://github.com/user-attachments/assets/5cc42a6f-9c51-40d0-b616-211d8d573a5c" />
+
 
 Hardend Pod
-<img width="1171" height="764" alt="Lab 2 Bild" src="https://github.com/user-attachments/assets/<din-bild-id-2>" />
+<img width="1343" height="552" alt="labb2" src="https://github.com/user-attachments/assets/44393add-f942-464b-8520-69bcbde31651" />
