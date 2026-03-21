@@ -24,12 +24,9 @@ SBOM och signering: CycloneDX-SBOM ger full transparens i supply chain och lista
 
 Gatekeeper-policys: Policy-as-code nekar automatiskt osäkra pods (“Bad Pod”), kräver labels, non-root och resource limits. Hardened Pod gick igenom med en varning om default service account. Detta flyttar säkerheten “left” i DevOps och gör DevSecOps praktiskt och repetitivt.
 
-Screenshots
-
 ### Screenshots
+Bad pod
+<img width="1171" height="764" alt="Lab 2 Screenshot" src="https://github.com/user-attachments/assets/<din-bild-id>" />
 
-**Bad Pod**
-![Lab 2 Screenshot](~/Downloads/labb2.png)
-
-**Hardened Pod**
-![Lab 2 Bild](~/Downloads/labb2\ bild.png)
+Hardend Pod
+<img width="1171" height="764" alt="Lab 2 Bild" src="https://github.com/user-attachments/assets/<din-bild-id-2>" />
