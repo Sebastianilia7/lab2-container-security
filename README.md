@@ -1,76 +1,35 @@
-Lab 2 – Container Security & Supply Chain Security
+Lab 2: Container Security
 
-I denna labb har vi arbetat med säkerhet i hela container-livscykeln och Kubernetes-policyer. Syftet har varit att förstå hur man identifierar och hanterar sårbarheter i containerbilder, härdar dem, genererar en SBOM (Software Bill of Materials) samt säkerställer korrekt nätverkspolicy i Kubernetes.
+Vad jag gjort
+	•	Vulnerable image: node:18-alpine + npm deps → många CVEs, ~58MB
+	•	Hardened image: node:18-alpine + non-root user + pinned deps → färre CVEs, ~45MB
+	•	Trivy scanning: scan-before.txt vs scan-after.txt
+	•	SBOM: CycloneDX-format (sboms/hardened-app.sbom.json) för supply chain-transparens
+	•	Cosign: Signed & verified localhost:5001/lab2-hardened-app:latest
+	•	Gatekeeper: Policies i chas-ff namespace testade:
+	•	Bad Pod → DENIED
+	•	Hardened Pod → ALLOWED (med warning om default SA)
 
-Projektbeskrivning
-
-Först byggde vi en medvetet sårbar Docker-image och scannade den med Trivy. Skanningen visade flera kritiska säkerhetsbrister, vilket gav en tydlig bild av riskerna med osäkra images. Därefter skapade vi en härdad version av imagen, med minimal base image, non-root user och rensade cache-filer. En ny Trivy-scan på den härdade imagen visade att de flesta kritiska sårbarheter försvunnit.
-
-Vi genererade också en SBOM i SPDX-format, som dokumenterar alla komponenter i imagen. Detta underlättar framtida säkerhetsgranskningar och gör det lättare att följa upp CVE:er och compliance-krav. Imagen signerades sedan med Cosign för att säkerställa integritet och verifierbarhet.
-
-NetworkPolicies i Kubernetes
-
-För att testa nätverkssäkerhet definierade vi NetworkPolicies som styr trafiken mellan pods:
-	•	Frontend → Backend: tillåtet
-	•	Frontend → MongoDB: blockerat
-
-Dessa policys verifierades genom att testa anslutningar, vilket visade att otillåtna anslutningar nekades och tillåtna fungerade som förväntat.
-
-Reflektion
-
-Labben har tydligt visat hur viktigt det är att hantera säkerhet i hela container-livscykeln, från base image till applikation. Sårbara images kan snabbt exponera kritiska CVE:er, medan härdade images med uppdaterade paket och non-root-användare minskar riskerna avsevärt.
-
-SBOM är ett värdefullt verktyg eftersom det ger fullständig insyn i komponenterna i en image och gör det enklare att snabbt agera vid upptäckta sårbarheter.
-
-Gatekeeper och NetworkPolicies tvingar teamet att följa säkerhetspolicys innan pods skapas, vilket gör säkerhet till en integrerad del av arbetsflödet och minskar risken för misstag.
-
-Exempel på Dockerfile
-
-Lab 2 – Container Security & Supply Chain Security
-
-I denna labb har vi arbetat med säkerhet i hela container-livscykeln och Kubernetes-policyer. Syftet har varit att förstå hur man identifierar och hanterar sårbarheter i containerbilder, härdar dem, genererar en SBOM (Software Bill of Materials) samt säkerställer korrekt nätverkspolicy i Kubernetes.
-
-Projektbeskrivning
-
-Först byggde vi en medvetet sårbar Docker-image och scannade den med Trivy. Skanningen visade flera kritiska säkerhetsbrister, vilket gav en tydlig bild av riskerna med osäkra images. Därefter skapade vi en härdad version av imagen, med minimal base image, non-root user och rensade cache-filer. En ny Trivy-scan på den härdade imagen visade att de flesta kritiska sårbarheter försvunnit.
-
-Vi genererade också en SBOM i SPDX-format, som dokumenterar alla komponenter i imagen. Detta underlättar framtida säkerhetsgranskningar och gör det lättare att följa upp CVE:er och compliance-krav. Imagen signerades sedan med Cosign för att säkerställa integritet och verifierbarhet.
-
-NetworkPolicies i Kubernetes
-
-För att testa nätverkssäkerhet definierade vi NetworkPolicies som styr trafiken mellan pods:
-	•	Frontend → Backend: tillåtet
-	•	Frontend → MongoDB: blockerat
-
-Dessa policys verifierades genom att testa anslutningar, vilket visade att otillåtna anslutningar nekades och tillåtna fungerade som förväntat.
+Verktyg
+	•	Trivy: Vulnerability scanning & SBOM generation
+	•	Docker: Container builds & tagging
+	•	Cosign: Signing & verification av images
+	•	Kubernetes + Gatekeeper/OPA: Policy enforcement, dry-run tests av pods
 
 Reflektion
 
-Labben har tydligt visat hur viktigt det är att hantera säkerhet i hela container-livscykeln, från base image till applikation. Sårbara images kan snabbt exponera kritiska CVE:er, medan härdade images med uppdaterade paket och non-root-användare minskar riskerna avsevärt.
+Container-säkerhet: Jag lärde mig att minimera attackytan är kritiskt. Att köra non-root hindrar privilege escalation, och att använda pinned deps i en slim-baserad image minskar antalet sårbarheter dramatiskt. Trivy visar konkret hur riskerna minskar – skillnaden mellan lab2-vulnerable-app och lab2-hardened-app är tydlig.
 
-SBOM är ett värdefullt verktyg eftersom det ger fullständig insyn i komponenterna i en image och gör det enklare att snabbt agera vid upptäckta sårbarheter.
+SBOM och signering: CycloneDX-SBOM ger full transparens i supply chain och listar alla komponenter (OS + npm deps), vilket gör CVE-hantering snabbare. Cosign-signering garanterar att ingen obehörig ändrat image, vilket stärker säkerheten i CI/CD-pipelines.
 
-Gatekeeper och NetworkPolicies tvingar teamet att följa säkerhetspolicys innan pods skapas, vilket gör säkerhet till en integrerad del av arbetsflödet och minskar risken för misstag.
+Gatekeeper-policys: Policy-as-code nekar automatiskt osäkra pods (“Bad Pod”), kräver labels, non-root och resource limits. Hardened Pod gick igenom med en varning om default service account. Detta flyttar säkerheten “left” i DevOps och gör DevSecOps praktiskt och repetitivt.
 
-Exempel på Dockerfile
+Screenshots
 
-Sårbar Dockerfile
+### Screenshots
 
-"FROM node:18
-WORKDIR /app
-COPY . .
-RUN npm install
-USER root
-EXPOSE 3000
-CMD ["node", "src/index.js"]"
+**Bad Pod**
+![Bad Pod](app/images/labb2.png)
 
-Härdad Dockerfile
-
-"FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production && rm -rf /var/cache/apk/* /tmp/*
-COPY . .
-USER node
-EXPOSE 3000
-CMD ["node", "src/index.js"]"
+**Hardened Pod**
+![Hardened Pod](app/images/labb2-bild.png)
