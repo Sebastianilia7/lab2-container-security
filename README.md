@@ -1,4 +1,4 @@
-Lab 2: Container Security
+## Lab 2: Container Security ##
 
 Vad jag gjort
 	•	Vulnerable image: node:18-alpine + npm deps → många CVEs, ~58MB
